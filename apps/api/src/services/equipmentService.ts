@@ -14,10 +14,12 @@ export async function findEquipmentBySerial(numeroSerie: string): Promise<Equipm
   const filePath = path.resolve(process.cwd(), "src/data/BBDD.csv");
   const fileContent = await fs.readFile(filePath, "utf8");
 
-  const rows = parse(fileContent, {
-    columns: true,
-    skip_empty_lines: true
-  }) as EquipmentRow[];
+const rows = parse(fileContent, {
+  columns: true,
+  skip_empty_lines: true,
+  relax_column_count: true,
+  bom: true
+}) as EquipmentRow[];
 
   const match = rows.find(
     (row) => String(row["Serial/Lot Number"] || "").trim().toLowerCase() === numeroSerie.trim().toLowerCase()
