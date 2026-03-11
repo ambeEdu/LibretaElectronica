@@ -1,0 +1,12 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "SHAREPOINT_SITE_ID": "",
+    "SHAREPOINT_BD_STOCK": "Control Stock BCN BD",
+    "ENTRA_TENANT_ID": "",
+    "ENTRA_CLIENT_ID": "",
+    "ENTRA_CLIENT_SECRET": ""
+  }
+}

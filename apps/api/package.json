@@ -1,0 +1,23 @@
+{
+  "name": "api",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/src/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "pnpm --filter @ambe/shared build && pnpm build && func start"
+  },
+  "dependencies": {
+    "@ambe/shared": "workspace:*",
+    "@azure/functions": "^4.6.0",
+    "@azure/identity": "^4.5.0",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
+    "cross-fetch": "^4.1.0",
+    "csv-parse": "^5.5.6"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.7.3"
+  }
+}

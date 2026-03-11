@@ -1,0 +1,11 @@
+{
+  "name": "libreta-electronica",
+  "private": true,
+  "version": "1.0.0",
+  "packageManager": "pnpm@10.23.0",
+  "scripts": {
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:api": "pnpm --filter api start",
+    "build": "pnpm -r build"
+  }
+}
