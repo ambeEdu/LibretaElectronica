@@ -6,7 +6,7 @@ export async function findMaterialByReference(referencia: string): Promise<Mater
   const safeReference = referencia.replace(/'/g, "''");
 
   const result = await graphClient
-    .api(`/sites/${env.sharePointSiteId}/lists/${env.stockList}/items`)
+    .api(`/sites/${env.sharePointSiteIdStock}/lists/${env.stockList}/items`)
     .expand("fields")
     .filter(`fields/Title eq '${safeReference}'`)
     .get();

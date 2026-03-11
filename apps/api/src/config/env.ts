@@ -5,8 +5,10 @@ function required(name: string): string {
 }
 
 export const env = {
-  sharePointSiteId: required("SHAREPOINT_SITE_ID"),
+  sharePointSiteIdStock: required("SHAREPOINT_SITE_ID_STOCK"),
   stockList: required("SHAREPOINT_LIST_STOCK"),
+  sharePointSiteIdLibreta: required("SHAREPOINT_SITE_ID_LIBRETA"),
+  libretaList: required("SHAREPOINT_LIST_LIBRETA"),
   tenantId: required("ENTRA_TENANT_ID"),
   clientId: required("ENTRA_CLIENT_ID"),
   clientSecret: required("ENTRA_CLIENT_SECRET")
