@@ -8,7 +8,7 @@ export async function saveIntervention(input: InterventionRequest): Promise<stri
     .post({
       fields: {
         Title: input.numeroSerie,
-        "TecnicoEmail@DisplayName": input.tecnicoEmail,
+        TecnicoEmail: input.tecnicoEmail,
         TecnicoNombre: input.tecnicoNombre,
         Fecha: input.fecha,
         TipoIntervencion: input.tipoIntervencion,
