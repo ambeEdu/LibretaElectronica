@@ -1,4 +1,4 @@
-import "cross-fetch/polyfill";
+import "cross-fetch/dist/node-polyfill.js";
 import { Client } from "@microsoft/microsoft-graph-client";
 import { ClientSecretCredential } from "@azure/identity";
 import { env } from "../config/env.js";
