@@ -10,8 +10,8 @@ app.http("postIntervention", {
   handler: async (request: HttpRequest) => {
     try {
       const body = (await request.json()) as InterventionRequest;
-
-      if (!body.tecnicoEmail || !body.tecnicoNombre || !body.fecha || !body.tipoIntervencion || !body.numeroSerie) {
+//!body.tecnicoEmail ||
+      if (!body.tecnicoNombre || !body.fecha || !body.tipoIntervencion || !body.numeroSerie) {
         return badRequest("Faltan campos obligatorios");
       }
 
