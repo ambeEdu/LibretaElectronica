@@ -7,7 +7,7 @@ interface EquipmentRow {
   ["Serial/Lot Number"]?: string;
   Location?: string;
   Status?: string;
-  ["Modelo 3"]?: string;
+  Product?: string;
 }
 
 export async function findEquipmentBySerial(numeroSerie: string): Promise<EquipmentResult> {
@@ -35,6 +35,6 @@ const rows = parse(fileContent, {
     numeroSerie: String(match["Serial/Lot Number"] || "").trim(),
     hospital: String(match.Location || "").trim(),
     estado: String(match.Status || "").trim(),
-    modelo: String(match["Modelo 3"] || "").trim()
+    modelo: String(match.Product || "").trim()
   };
 }
