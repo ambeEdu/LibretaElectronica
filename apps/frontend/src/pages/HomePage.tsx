@@ -16,7 +16,7 @@ export default function HomePage() {
   const [modelo,setModelo] = useState("")
 
   const [tecnicoNombre,setTecnicoNombre] = useState("")
-  const [tecnicoEmail,setTecnicoEmail] = useState("")
+  //const [tecnicoEmail,setTecnicoEmail] = useState("")
   const [fecha,setFecha] = useState("")
 
   const [tipoIntervencion,setTipoIntervencion] = useState("")
@@ -126,7 +126,7 @@ export default function HomePage() {
 
     const payload = {
 
-      tecnicoEmail,
+      //tecnicoEmail,
       tecnicoNombre,
 
       fecha,
@@ -222,11 +222,11 @@ export default function HomePage() {
           onChange={e=>setTecnicoNombre(e.target.value)}
         />
 
-        <label>Email técnico</label>
-        <input
-          value={tecnicoEmail}
-          onChange={e=>setTecnicoEmail(e.target.value)}
-        />
+        {/* <label>Email técnico<label>} */}
+        {/* <input */}
+          {/* value={tecnicoEmail} */}
+          {/* onChange={e=>setTecnicoEmail(e.target.value)} */}
+        {/* /> */}
 
         <label>Fecha</label>
         <input
