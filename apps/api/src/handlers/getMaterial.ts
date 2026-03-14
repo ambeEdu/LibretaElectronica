@@ -9,12 +9,13 @@ app.http("getMaterial", {
   handler: async (request: HttpRequest) => {
     try {
       const referencia = request.query.get("referencia");
+      const modelo = request.query.get("modelo") || undefined;
 
       if (!referencia) {
         return badRequest("El parámetro 'referencia' es obligatorio");
       }
 
-      const result = await findMaterialByReference(referencia);
+      const result = await findMaterialByReference(referencia, modelo);
       return ok(result);
     } catch (error) {
       return serverError(error instanceof Error ? error.message : "Unexpected error");

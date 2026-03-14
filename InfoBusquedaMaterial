@@ -1,0 +1,20 @@
+# Cambios realizados
+
+## Objetivo
+Restringir la búsqueda de referencias para que solo aparezcan materiales cuya columna **Familia** sea compatible con el **Product** del equipo obtenido desde el número de serie.
+
+## Archivos modificados
+- `apps/api/src/repositories/materialRepository.ts`
+- `apps/api/src/handlers/getMaterial.ts`
+- `apps/api/src/index.ts`
+- `apps/frontend/src/pages/HomePage.tsx`
+
+## Archivos nuevos
+- `apps/api/src/handlers/searchMaterials.ts`
+- `apps/api/src/data/productFamilies.ts`
+
+## Lógica aplicada
+- Se genera un mapa `Product -> Familias permitidas` a partir del Excel proporcionado.
+- La búsqueda de sugerencias (`/api/materiales`) solo devuelve referencias cuya `Familia` esté dentro de las familias permitidas para el `Product` del equipo.
+- La validación final al añadir material (`/api/material`) también comprueba la compatibilidad, evitando que se agreguen referencias de otra familia aunque se escriban manualmente.
+- En frontend, las sugerencias solo aparecen cuando ya existe un modelo cargado desde el número de serie.
