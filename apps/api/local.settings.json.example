@@ -3,8 +3,10 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "node",
-    "SHAREPOINT_SITE_ID": "",
-    "SHAREPOINT_BD_STOCK": "Control Stock BCN BD",
+    "SHAREPOINT_SITE_ID_STOCK": "",
+    "SHAREPOINT_LIST_STOCK": "",
+    "SHAREPOINT_SITE_ID_LIBRETA": "",
+    "SHAREPOINT_LIST_LIBRETA": "Libreta Electrónica",
     "ENTRA_TENANT_ID": "",
     "ENTRA_CLIENT_ID": "",
     "ENTRA_CLIENT_SECRET": ""
