@@ -9,12 +9,17 @@ app.http("getMaterial", {
   handler: async (request: HttpRequest) => {
     try {
       const referencia = request.query.get("referencia");
+      const product = request.query.get("product");
 
       if (!referencia) {
         return badRequest("El parámetro 'referencia' es obligatorio");
       }
 
-      const result = await findMaterialByReference(referencia);
+      if (!product) {
+        return badRequest("El parámetro 'product' es obligatorio");
+      }
+
+      const result = await findMaterialByReference(referencia, product);
       return ok(result);
     } catch (error) {
       return serverError(error instanceof Error ? error.message : "Unexpected error");
