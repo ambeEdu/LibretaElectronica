@@ -8,6 +8,7 @@ interface MaterialLine {
   familia?: string;
 }
 
+
 const interventionTypes = [
   "Correctivo",
   "Preventivo",
@@ -23,7 +24,9 @@ export default function HomePage() {
   const [modelo, setModelo] = useState("");
 
   const [tecnicoNombre, setTecnicoNombre] = useState("");
+
   // const [tecnicoEmail,setTecnicoEmail] = useState("")
+  
   const [fecha, setFecha] = useState("");
 
   const [tipoIntervencion, setTipoIntervencion] = useState("");
@@ -36,6 +39,11 @@ export default function HomePage() {
 
   const [referenciaBusqueda, setReferenciaBusqueda] = useState("");
   const [materiales, setMateriales] = useState<MaterialLine[]>([]);
+
+  const hoy = new Date();
+  const dia = String(hoy.getDate()).padStart(2, '0');
+  const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+  const anio = hoy.getFullYear();
 
   async function buscarEquipo() {
     if (!numeroSerie) return;
@@ -108,18 +116,18 @@ export default function HomePage() {
     setMateriales((prev) => prev.filter((m) => m.referencia !== referencia));
   }
 
+
   async function guardarIntervencion() {
     if (!tipoIntervencion) {
       alert("Debes seleccionar un tipo de intervención");
       return;
     }
 
-    const hoy = new Date();
 
     const payload = {
       // tecnicoEmail,
       tecnicoNombre,
-      fecha,
+      fecha:dia + "/" + mes + "/" + anio,
       tipoIntervencion,
       numeroSerie,
       hospital,
@@ -131,8 +139,8 @@ export default function HomePage() {
       observaciones,
       seguridadElectrica,
       materialesJson: materiales,
-      mes: hoy.getMonth() + 1,
-      anio: hoy.getFullYear(),
+      mes: mes,
+      anio: anio,
       archivado: false,
       fechaArchivado: null
     };
@@ -200,8 +208,9 @@ export default function HomePage() {
         <label>Fecha</label>
         <input
           type="date"
-          value={fecha}
+          value={hoy.getFullYear() + "-" + String(hoy.getMonth() + 1).padStart(2, '0') + "-" + String(hoy.getDate()).padStart(2, '0')}
           onChange={(e) => setFecha(e.target.value)}
+          readOnly
         />
 
         <label>Tipo intervención</label>
@@ -259,8 +268,9 @@ export default function HomePage() {
             <tr
               key={m.referencia}
               style={{
-                backgroundColor: m.stockActual === 0 ? "#ffe5e5" : "white",
-                color: m.stockActual === 0 ? "#b00020" : "black"
+                backgroundColor: m.stockActual === 0 ? "#fd5e5e" : "white",
+                color: m.stockActual === 0 ? "#ffeaee" : "black",
+                fontWeight: m.stockActual === 0 ? "bold" : "normal"
               }}
             >
               <td style={tdStyle}>{m.referencia}</td>
@@ -310,8 +320,8 @@ export default function HomePage() {
 
         <label>Seguridad eléctrica</label>
         <input
-          value={seguridadElectrica}
-          onChange={(e) => setSeguridadElectrica(e.target.value)}
+          value={"OK"}
+          readOnly
         />
       </div>
 
