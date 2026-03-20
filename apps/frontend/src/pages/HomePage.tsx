@@ -1,21 +1,9 @@
 import { useState } from "react";
-
-interface MaterialLine {
-  referencia: string;
-  descripcion: string;
-  cantidad: number;
-  stockActual: number;
-  familia?: string;
-}
-
-
-const interventionTypes = [
-  "Correctivo",
-  "Preventivo",
-  "FSCA",
-  "F.Action Open",
-  "F.Action Close"
-];
+import HeaderForm from "../components/HeaderForm";
+import MaterialSearch from "../components/MaterialSearch";
+import MaterialsTable from "../components/MaterialsTable";
+import InterventionInfo from "../components/InterventionInfo";
+import type { MaterialLine } from "../types/intervention";
 
 export default function HomePage() {
   const [numeroSerie, setNumeroSerie] = useState("");
@@ -24,26 +12,23 @@ export default function HomePage() {
   const [modelo, setModelo] = useState("");
 
   const [tecnicoNombre, setTecnicoNombre] = useState("");
-
-  // const [tecnicoEmail,setTecnicoEmail] = useState("")
-  
-  const [fecha, setFecha] = useState("");
-
   const [tipoIntervencion, setTipoIntervencion] = useState("");
   const [numeroInventario, setNumeroInventario] = useState("");
   const [numeroParte, setNumeroParte] = useState("");
 
   const [descripcionError, setDescripcionError] = useState("");
   const [observaciones, setObservaciones] = useState("");
-  const [seguridadElectrica, setSeguridadElectrica] = useState("");
 
   const [referenciaBusqueda, setReferenciaBusqueda] = useState("");
   const [materiales, setMateriales] = useState<MaterialLine[]>([]);
 
   const hoy = new Date();
-  const dia = String(hoy.getDate()).padStart(2, '0');
-  const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+  const dia = String(hoy.getDate()).padStart(2, "0");
+  const mes = String(hoy.getMonth() + 1).padStart(2, "0");
   const anio = hoy.getFullYear();
+
+  const fechaInput = `${anio}-${mes}-${dia}`;
+  const fechaTexto = `${dia}/${mes}/${anio}`;
 
   async function buscarEquipo() {
     if (!numeroSerie) return;
@@ -87,7 +72,9 @@ export default function HomePage() {
     if (existente) {
       setMateriales((prev) =>
         prev.map((m) =>
-          m.referencia === data.referencia ? { ...m, cantidad: m.cantidad + 1 } : m
+          m.referencia === data.referencia
+            ? { ...m, cantidad: m.cantidad + 1 }
+            : m
         )
       );
     } else {
@@ -116,18 +103,15 @@ export default function HomePage() {
     setMateriales((prev) => prev.filter((m) => m.referencia !== referencia));
   }
 
-
   async function guardarIntervencion() {
     if (!tipoIntervencion) {
       alert("Debes seleccionar un tipo de intervención");
       return;
     }
 
-
     const payload = {
-      // tecnicoEmail,
       tecnicoNombre,
-      fecha:dia + "/" + mes + "/" + anio,
+      fecha: fechaTexto,
       tipoIntervencion,
       numeroSerie,
       hospital,
@@ -137,10 +121,10 @@ export default function HomePage() {
       modelo,
       descripcionError,
       observaciones,
-      seguridadElectrica,
+      seguridadElectrica: "OK",
       materialesJson: materiales,
-      mes: mes,
-      anio: anio,
+      mes,
+      anio,
       archivado: false,
       fechaArchivado: null
     };
@@ -155,9 +139,18 @@ export default function HomePage() {
 
     if (res.ok) {
       alert("Intervención guardada");
-
       setMateriales([]);
       setNumeroSerie("");
+      setHospital("");
+      setEstado("");
+      setModelo("");
+      setTecnicoNombre("");
+      setTipoIntervencion("");
+      setNumeroInventario("");
+      setNumeroParte("");
+      setDescripcionError("");
+      setObservaciones("");
+      setReferenciaBusqueda("");
     } else {
       alert("Error guardando intervención");
     }
@@ -167,163 +160,42 @@ export default function HomePage() {
     <div style={{ padding: 30, fontFamily: "Arial" }}>
       <h2>Libreta electrónica</h2>
 
-      <h3>Cabecera</h3>
+      <HeaderForm
+        numeroSerie={numeroSerie}
+        setNumeroSerie={setNumeroSerie}
+        hospital={hospital}
+        estado={estado}
+        modelo={modelo}
+        tecnicoNombre={tecnicoNombre}
+        setTecnicoNombre={setTecnicoNombre}
+        fecha={fechaInput}
+        tipoIntervencion={tipoIntervencion}
+        setTipoIntervencion={setTipoIntervencion}
+        numeroInventario={numeroInventario}
+        setNumeroInventario={setNumeroInventario}
+        numeroParte={numeroParte}
+        setNumeroParte={setNumeroParte}
+        buscarEquipo={buscarEquipo}
+      />
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "200px 300px",
-          gap: 10,
-          marginBottom: 30
-        }}
-      >
-        <label>Nº Serie</label>
-        <input
-          value={numeroSerie}
-          onChange={(e) => setNumeroSerie(e.target.value)}
-          onBlur={buscarEquipo}
-        />
+      <MaterialSearch
+        referenciaBusqueda={referenciaBusqueda}
+        setReferenciaBusqueda={setReferenciaBusqueda}
+        agregarMaterial={agregarMaterial}
+      />
 
-        <label>Hospital</label>
-        <input value={hospital} readOnly />
+      <MaterialsTable
+        materiales={materiales}
+        actualizarCantidad={actualizarCantidad}
+        eliminarMaterial={eliminarMaterial}
+      />
 
-        <label>Estado</label>
-        <input value={estado} readOnly />
-
-        <label>Modelo</label>
-        <input value={modelo} readOnly />
-
-        <label>Técnico</label>
-        <input
-          value={tecnicoNombre}
-          onChange={(e) => setTecnicoNombre(e.target.value)}
-        />
-
-        {/* <label>Email técnico<label>} */}
-        {/* <input */}
-        {/* value={tecnicoEmail} */}
-        {/* onChange={e=>setTecnicoEmail(e.target.value)} */}
-        {/* /> */}
-
-        <label>Fecha</label>
-        <input
-          type="date"
-          value={hoy.getFullYear() + "-" + String(hoy.getMonth() + 1).padStart(2, '0') + "-" + String(hoy.getDate()).padStart(2, '0')}
-          onChange={(e) => setFecha(e.target.value)}
-          readOnly
-        />
-
-        <label>Tipo intervención</label>
-        <select
-          value={tipoIntervencion}
-          onChange={(e) => setTipoIntervencion(e.target.value)}
-        >
-          <option value="">Selecciona un tipo</option>
-          {interventionTypes.map((type) => (
-            <option key={type} value={type}>
-              {type}
-            </option>
-          ))}
-        </select>
-
-        <label>Nº Inventario</label>
-        <input
-          value={numeroInventario}
-          onChange={(e) => setNumeroInventario(e.target.value)}
-        />
-
-        <label>Nº Parte</label>
-        <input
-          value={numeroParte}
-          onChange={(e) => setNumeroParte(e.target.value)}
-        />
-      </div>
-
-      <h3>Materiales</h3>
-
-      <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-        <input
-          placeholder="Referencia"
-          value={referenciaBusqueda}
-          onChange={(e) => setReferenciaBusqueda(e.target.value)}
-        />
-
-        <button onClick={agregarMaterial}>Añadir material</button>
-      </div>
-
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={thStyle}>Referencia</th>
-            <th style={thStyle}>Descripción</th>
-            <th style={thStyle}>Cantidad</th>
-            <th style={thStyle}>Stock</th>
-            <th style={thStyle}>Familia</th>
-            <th style={thStyle}></th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {materiales.map((m) => (
-            <tr
-              key={m.referencia}
-              style={{
-                backgroundColor: m.stockActual === 0 ? "#fd5e5e" : "white",
-                color: m.stockActual === 0 ? "#ffeaee" : "black",
-                fontWeight: m.stockActual === 0 ? "bold" : "normal"
-              }}
-            >
-              <td style={tdStyle}>{m.referencia}</td>
-
-              <td style={tdStyle}>{m.descripcion}</td>
-
-              <td style={tdStyle}>
-                <input
-                  type="number"
-                  min={1}
-                  value={m.cantidad}
-                  onChange={(e) =>
-                    actualizarCantidad(m.referencia, Number(e.target.value))
-                  }
-                  style={{ width: 70 }}
-                />
-              </td>
-
-              <td style={tdStyle}>{m.stockActual}</td>
-
-              <td style={tdStyle}>{m.familia}</td>
-
-              <td style={tdStyle}>
-                <button onClick={() => eliminarMaterial(m.referencia)}>
-                  Eliminar
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <h3 style={{ marginTop: 40 }}>Información intervención</h3>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 600 }}>
-        <label>Descripción error</label>
-        <textarea
-          value={descripcionError}
-          onChange={(e) => setDescripcionError(e.target.value)}
-        />
-
-        <label>Observaciones</label>
-        <textarea
-          value={observaciones}
-          onChange={(e) => setObservaciones(e.target.value)}
-        />
-
-        <label>Seguridad eléctrica</label>
-        <input
-          value={"OK"}
-          readOnly
-        />
-      </div>
+      <InterventionInfo
+        descripcionError={descripcionError}
+        setDescripcionError={setDescripcionError}
+        observaciones={observaciones}
+        setObservaciones={setObservaciones}
+      />
 
       <button onClick={guardarIntervencion} style={{ marginTop: 30 }}>
         Guardar intervención
@@ -331,15 +203,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-const thStyle: React.CSSProperties = {
-  border: "1px solid #ccc",
-  padding: "8px",
-  background: "#f2f2f2",
-  textAlign: "left"
-};
-
-const tdStyle: React.CSSProperties = {
-  border: "1px solid #ccc",
-  padding: "8px"
-};
