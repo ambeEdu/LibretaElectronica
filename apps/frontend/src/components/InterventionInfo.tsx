@@ -3,13 +3,17 @@ interface InterventionInfoProps {
   setDescripcionError: (value: string) => void;
   observaciones: string;
   setObservaciones: (value: string) => void;
+  seguridadElectrica: string;
+  setSeguridadElectrica: (value: string) => void;
 }
 
 export default function InterventionInfo({
   descripcionError,
   setDescripcionError,
   observaciones,
-  setObservaciones
+  setObservaciones,
+  seguridadElectrica,
+  setSeguridadElectrica
 }: InterventionInfoProps) {
   return (
     <>
@@ -36,7 +40,13 @@ export default function InterventionInfo({
         />
 
         <label>Seguridad eléctrica</label>
-        <input value="OK" readOnly />
+        <select
+          value={seguridadElectrica}
+          onChange={(e) => setSeguridadElectrica(e.target.value)}
+        >
+          <option value="OK">OK</option>
+          <option value="No OK">No OK</option>
+        </select>
       </div>
     </>
   );

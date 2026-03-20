@@ -30,6 +30,8 @@ export default function HomePage() {
   const fechaInput = `${anio}-${mes}-${dia}`;
   const fechaTexto = `${dia}/${mes}/${anio}`;
 
+  const [seguridadElectrica, setSeguridadElectrica] = useState("OK");
+
   async function buscarEquipo() {
     if (!numeroSerie) return;
 
@@ -195,6 +197,8 @@ export default function HomePage() {
         setDescripcionError={setDescripcionError}
         observaciones={observaciones}
         setObservaciones={setObservaciones}
+        seguridadElectrica={seguridadElectrica}
+        setSeguridadElectrica={setSeguridadElectrica}
       />
 
       <button onClick={guardarIntervencion} style={{ marginTop: 30 }}>

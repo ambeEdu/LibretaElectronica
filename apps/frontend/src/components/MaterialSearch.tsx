@@ -18,6 +18,7 @@ export default function MaterialSearch({
           placeholder="Referencia"
           value={referenciaBusqueda}
           onChange={(e) => setReferenciaBusqueda(e.target.value)}
+          
         />
 
         <button onClick={agregarMaterial}>Añadir material</button>
