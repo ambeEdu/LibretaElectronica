@@ -31,6 +31,7 @@ export interface InterventionRequest {
   numeroInventario?: string;
   numeroParte?: string;
   modelo?: string;
+  software?: string;
   descripcionError?: string;
   observaciones?: string;
   seguridadElectrica?: string;

@@ -18,6 +18,7 @@ export async function saveIntervention(input: InterventionRequest): Promise<stri
         NumeroInventario: input.numeroInventario || "",
         NumeroParte: input.numeroParte || "",
         Modelo: input.modelo || "",
+        Software: input.software || "",
         DescripcionError: input.descripcionError || "",
         Observaciones: input.observaciones || "",
         SeguridadElectrica: input.seguridadElectrica || "",
