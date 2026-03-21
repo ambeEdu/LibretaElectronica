@@ -1,9 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import HeaderForm from "../components/HeaderForm";
 import MaterialSearch from "../components/MaterialSearch";
 import MaterialsTable from "../components/MaterialsTable";
 import InterventionInfo from "../components/InterventionInfo";
 import type { MaterialLine } from "../types/intervention";
+import SoftwareCalibrationSection from "../components/SoftwareCalibrationSection";
+import { valoresFamilia } from "../types/valoresFamilia";
+import {
+  softwarePorFamilia,
+  calibracionesPorFamilia
+} from "../types/software";
 
 export default function HomePage() {
   const [numeroSerie, setNumeroSerie] = useState("");
@@ -18,9 +24,15 @@ export default function HomePage() {
 
   const [descripcionError, setDescripcionError] = useState("");
   const [observaciones, setObservaciones] = useState("");
+  const [seguridadElectrica, setSeguridadElectrica] = useState("OK");
 
   const [referenciaBusqueda, setReferenciaBusqueda] = useState("");
   const [materiales, setMateriales] = useState<MaterialLine[]>([]);
+
+  const [softwareSeleccionado, setSoftwareSeleccionado] = useState("");
+  const [calibrationValues, setCalibrationValues] = useState<
+    { nombre: string; valor: string; min?: number | string; max?: number | string }[]
+  >([]);
 
   const hoy = new Date();
   const dia = String(hoy.getDate()).padStart(2, "0");
@@ -30,7 +42,57 @@ export default function HomePage() {
   const fechaInput = `${anio}-${mes}-${dia}`;
   const fechaTexto = `${dia}/${mes}/${anio}`;
 
-  const [seguridadElectrica, setSeguridadElectrica] = useState("OK");
+  const familiasExcel = modelo ? valoresFamilia[modelo] || [] : [];
+
+  const softwareOptions = Array.from(
+    new Set(
+      familiasExcel.flatMap((familia) => softwarePorFamilia[familia] || [])
+    )
+  );
+
+  const calibraciones = Array.from(
+    new Map(
+      familiasExcel
+        .flatMap((familia) => calibracionesPorFamilia[familia] || [])
+        .map((item) => [item.nombre, item])
+    ).values()
+  );
+
+  useEffect(() => {
+    setSoftwareSeleccionado("");
+    setCalibrationValues([]);
+  }, [modelo]);
+
+  function setCalibrationValue(nombre: string, valor: string) {
+    const calibracion = calibraciones.find((c) => c.nombre === nombre);
+
+    setCalibrationValues((prev) => {
+      const existente = prev.find((c) => c.nombre === nombre);
+
+      if (existente) {
+        return prev.map((c) =>
+          c.nombre === nombre
+            ? {
+                ...c,
+                valor,
+                min: calibracion?.min,
+                max: calibracion?.max
+              }
+            : c
+        );
+      }
+
+      return [
+        ...prev,
+        {
+          nombre,
+          valor,
+          min: calibracion?.min,
+          max: calibracion?.max
+        }
+      ];
+    });
+  }
 
   async function buscarEquipo() {
     if (!numeroSerie) return;
@@ -59,7 +121,9 @@ export default function HomePage() {
     }
 
     const res = await fetch(
-      `/api/material?referencia=${encodeURIComponent(referenciaBusqueda)}&product=${encodeURIComponent(modelo)}`
+      `/api/material?referencia=${encodeURIComponent(
+        referenciaBusqueda
+      )}&product=${encodeURIComponent(modelo)}`
     );
 
     const data = await res.json();
@@ -121,9 +185,12 @@ export default function HomePage() {
       numeroInventario,
       numeroParte,
       modelo,
+      familiasExcel,
+      software: softwareSeleccionado,
+      calibracionesJson: calibrationValues,
       descripcionError,
       observaciones,
-      seguridadElectrica: "OK",
+      seguridadElectrica,
       materialesJson: materiales,
       mes,
       anio,
@@ -152,7 +219,10 @@ export default function HomePage() {
       setNumeroParte("");
       setDescripcionError("");
       setObservaciones("");
+      setSeguridadElectrica("OK");
       setReferenciaBusqueda("");
+      setSoftwareSeleccionado("");
+      setCalibrationValues([]);
     } else {
       alert("Error guardando intervención");
     }
@@ -190,6 +260,15 @@ export default function HomePage() {
         materiales={materiales}
         actualizarCantidad={actualizarCantidad}
         eliminarMaterial={eliminarMaterial}
+      />
+
+      <SoftwareCalibrationSection
+        softwareOptions={softwareOptions}
+        softwareSeleccionado={softwareSeleccionado}
+        setSoftwareSeleccionado={setSoftwareSeleccionado}
+        calibraciones={calibraciones}
+        calibrationValues={calibrationValues}
+        setCalibrationValue={setCalibrationValue}
       />
 
       <InterventionInfo

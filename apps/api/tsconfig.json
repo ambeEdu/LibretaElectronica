@@ -6,5 +6,5 @@
     "moduleResolution": "NodeNext",
     "types": ["node"]
   },
-  "include": ["src"]
+  "include": ["src", "../frontend/src/types/valoresFamilia.ts"]
 }
