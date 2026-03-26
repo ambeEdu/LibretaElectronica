@@ -1,6 +1,6 @@
 /**
  * Exporta todos los tipos del dominio
  */
-export * from "./interventions";
-export * from "./materials";
-export * from "./equipment";
+export * from "./interventions.js";
+export * from "./materials.js";
+export * from "./equipment.js";

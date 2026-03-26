@@ -10,7 +10,6 @@ export class SharedError extends Error {
   ) {
     super(message);
     Object.setPrototypeOf(this, SharedError.prototype);
-    Error.captureStackTrace(this, this.constructor);
   }
 
   toJSON() {

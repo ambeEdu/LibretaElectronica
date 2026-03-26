@@ -1,4 +1,4 @@
 /**
  * Exporta utilidades compartidas
  */
-export * from "./constants";
+export * from "./constants.js";

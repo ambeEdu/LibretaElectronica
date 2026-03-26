@@ -1,5 +1,5 @@
 import { HttpRequest, HttpResponseInit } from "@azure/functions";
-import { AppError } from "./AppError";
+import { AppError } from "./AppError.js";
 
 /**
  * Manejador centralizado de errores para Azure Functions
@@ -11,12 +11,13 @@ export function handleError(error: unknown): HttpResponseInit {
 
   // Si es un AppError conocido
   if (error instanceof AppError) {
+    const appError = error as AppError;
     return {
-      status: error.statusCode,
+      status: appError.statusCode,
       jsonBody: {
         ok: false,
-        errorCode: error.errorCode,
-        message: error.message,
+        errorCode: appError.errorCode,
+        message: appError.message,
       },
     };
   }

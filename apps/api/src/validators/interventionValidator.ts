@@ -1,6 +1,6 @@
 import { InterventionRequest } from "@ambe/shared";
-import { AppError } from "../core/errors/AppError";
-import { CONSTANTS } from "../core/config/constants";
+import { AppError } from "../core/errors/AppError.js";
+import { CONSTANTS } from "../core/config/constants.js";
 
 /**
  * Validador para InterventionRequest
@@ -36,7 +36,7 @@ export class InterventionValidator {
     this.validateYear(data.anio as number);
     this.validateMaterials(data.materialesJson as unknown);
 
-    return data as InterventionRequest;
+    return data as unknown as InterventionRequest;
   }
 
   /**

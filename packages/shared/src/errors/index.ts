@@ -1,4 +1,4 @@
 /**
  * Exporta errores compartidos
  */
-export * from "./SharedError";
+export * from "./SharedError.js";

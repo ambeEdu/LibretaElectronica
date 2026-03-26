@@ -4,10 +4,10 @@
  */
 
 // Dominio
-export * from "./domain/index";
+export * from "./domain/index.js";
 
 // Errores
-export * from "./errors/index";
+export * from "./errors/index.js";
 
 // Utilidades
-export * from "./utils/index";
+export * from "./utils/index.js";
