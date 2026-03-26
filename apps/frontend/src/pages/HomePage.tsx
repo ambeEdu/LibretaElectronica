@@ -177,7 +177,7 @@ export default function HomePage() {
 
     const payload = {
       tecnicoNombre,
-      fecha: fechaTexto,
+      fecha: hoy.toISOString(),
       tipoIntervencion,
       numeroSerie,
       hospital,
@@ -224,7 +224,9 @@ export default function HomePage() {
       setSoftwareSeleccionado("");
       setCalibrationValues([]);
     } else {
-      alert("Error guardando intervención");
+      const errorText = await res.text();
+      console.error("Error guardando intervención:", errorText);
+      alert(`Error guardando intervención: ${errorText}`);
     }
   }
 
