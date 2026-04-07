@@ -9,6 +9,11 @@ export interface MaterialLine {
   cantidad: number;
 }
 
+export interface CalibrationValue {
+  nombre: string;
+  valor: string;
+}
+
 export interface InterventionRequest {
   tecnicoNombre: string;
   fecha: string;
@@ -23,6 +28,7 @@ export interface InterventionRequest {
   descripcionError?: string;
   observaciones?: string;
   seguridadElectrica?: string;
+  calibracionesJson?: CalibrationValue[];
   materialesJson: MaterialLine[];
   mes: number;
   anio: number;
