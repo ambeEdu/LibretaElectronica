@@ -21,7 +21,6 @@ export interface MaterialResult {
 }
 
 export interface InterventionRequest {
-  tecnicoEmail: string;
   tecnicoNombre: string;
   fecha: string;
   tipoIntervencion: string;

@@ -10,7 +10,6 @@ export interface MaterialLine {
 }
 
 export interface InterventionRequest {
-  tecnicoEmail: string;
   tecnicoNombre: string;
   fecha: string;
   tipoIntervencion: string;
