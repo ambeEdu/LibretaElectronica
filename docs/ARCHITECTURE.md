@@ -190,7 +190,6 @@ Todos los tipos se definen en `packages/shared/src/domain/`:
 ```typescript
 // En shared/src/domain/interventions.ts
 export interface InterventionRequest {
-  tecnicoEmail: string;
   tecnicoNombre: string;
   // ...más campos
 }

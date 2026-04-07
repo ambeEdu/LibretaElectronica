@@ -5,7 +5,6 @@
 import { InterventionRequest } from "@ambe/shared";
 
 export const mockInterventionRequest: InterventionRequest = {
-  tecnicoEmail: "test@example.com",
   tecnicoNombre: "Test Técnico",
   fecha: "2024-03-26",
   tipoIntervencion: "Preventivo",

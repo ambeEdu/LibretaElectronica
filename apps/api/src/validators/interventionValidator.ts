@@ -19,7 +19,6 @@ export class InterventionValidator {
     const data = intervention as Record<string, unknown>;
 
     // Validaciones de campos requeridos
-    this.validateRequiredField(data, "tecnicoEmail", "string");
     this.validateRequiredField(data, "tecnicoNombre", "string");
     this.validateRequiredField(data, "fecha", "string");
     this.validateRequiredField(data, "tipoIntervencion", "string");
@@ -31,7 +30,6 @@ export class InterventionValidator {
     this.validateRequiredField(data, "archivado", "boolean");
 
     // Validaciones específicas
-    this.validateEmail(data.tecnicoEmail as string);
     this.validateMonth(data.mes as number);
     this.validateYear(data.anio as number);
     this.validateMaterials(data.materialesJson as unknown);
@@ -55,16 +53,6 @@ export class InterventionValidator {
       throw AppError.BadRequest(
         `El campo '${field}' debe ser de tipo ${expectedType}`
       );
-    }
-  }
-
-  /**
-   * Valida formato de email
-   */
-  private static validateEmail(email: string): void {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      throw AppError.BadRequest(`El email '${email}' no es válido`);
     }
   }
 

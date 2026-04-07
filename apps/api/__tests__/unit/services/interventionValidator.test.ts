@@ -14,20 +14,9 @@ describe("InterventionValidator", () => {
     expect(result).toEqual(mockInterventionRequest);
   });
 
-  it("debe lanzar error si falta email", () => {
+  it("debe lanzar error si falta técnico", () => {
     const invalid = { ...mockInterventionRequest };
-    delete (invalid as Partial<typeof invalid>).tecnicoEmail;
-
-    expect(() => {
-      InterventionValidator.validate(invalid);
-    }).toThrow(AppError);
-  });
-
-  it("debe lanzar error si email es inválido", () => {
-    const invalid = {
-      ...mockInterventionRequest,
-      tecnicoEmail: "invalid-email",
-    };
+    delete (invalid as Partial<typeof invalid>).tecnicoNombre;
 
     expect(() => {
       InterventionValidator.validate(invalid);

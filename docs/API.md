@@ -66,8 +66,7 @@ Crea una nueva intervención.
 **Body:**
 ```json
 {
-  "tecnicoEmail": "tecnico@example.com",
-  "tecnicoNombre": "Juan Pérez",
+    "tecnicoNombre": "Juan Pérez",
   "fecha": "2024-03-26",
   "tipoIntervencion": "Preventivo",
   "numeroSerie": "SN123456",
@@ -106,7 +105,7 @@ Crea una nueva intervención.
 {
   "ok": false,
   "errorCode": "BAD_REQUEST",
-  "message": "El campo 'tecnicoEmail' es requerido"
+  "message": "El campo 'tecnicoNombre' es requerido"
 }
 ```
 
@@ -146,7 +145,7 @@ curl -X GET http://localhost:7071/api/material/REF-001
 # Crear intervención
 curl -X POST http://localhost:7071/api/interventions \
   -H "Content-Type: application/json" \
-  -d '{"tecnicoEmail":"...","tecnicoNombre":"...",...}'
+  -d '{"tecnicoNombre":"...",...}'
 ```
 
 ---
