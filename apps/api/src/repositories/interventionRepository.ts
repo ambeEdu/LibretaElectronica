@@ -21,6 +21,7 @@ export async function saveIntervention(input: InterventionRequest): Promise<stri
         DescripcionError: input.descripcionError || "",
         Observaciones: input.observaciones || "",
         SeguridadElectrica: input.seguridadElectrica || "",
+        Calibraciones: JSON.stringify(input.calibracionesJson ?? []),
         MaterialesJson: JSON.stringify(input.materialesJson),
         Mes: input.mes,
         A_x00f1_o: input.anio,
