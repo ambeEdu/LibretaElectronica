@@ -76,6 +76,14 @@ Crea una nueva intervención.
   "numeroParte": "PART001",
   "modelo": "Modelo X",
   "software": "v2.0",
+  "calibracionesJson": [
+    {
+      "nombre": "Ganancia canal A",
+      "valor": "1.02",
+      "min": 0.95,
+      "max": 1.05
+    }
+  ],
   "descripcionError": "Problema de conectividad",
   "observaciones": "Se reemplazó componente",
   "seguridadElectrica": "OK",
