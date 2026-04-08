@@ -118,12 +118,35 @@ function parseMateriales(raw: string | undefined): MaterialLine[] {
       });
     }
 
+    const getString = (item: Record<string, unknown>, keys: string[]): string => {
+      for (const key of keys) {
+        if (typeof item[key] === "string") {
+          return String(item[key]).trim();
+        }
+      }
+      return "";
+    };
+
+    const getNumber = (item: Record<string, unknown>, keys: string[]): number => {
+      for (const key of keys) {
+        const value = item[key];
+        if (typeof value === "number") return value;
+        if (typeof value === "string" && value.trim()) {
+          const parsedValue = Number(value);
+          if (Number.isFinite(parsedValue)) {
+            return parsedValue;
+          }
+        }
+      }
+      return 0;
+    };
+
     return parsed
       .filter((item): item is Record<string, unknown> => typeof item === "object" && item !== null)
       .map((item) => ({
-        referencia: typeof item.referencia === "string" ? item.referencia : "",
-        descripcion: typeof item.descripcion === "string" ? item.descripcion : "",
-        cantidad: typeof item.cantidad === "number" ? item.cantidad : Number(item.cantidad ?? 0)
+        referencia: getString(item, ["referencia", "Referencia", "reference", "Reference"]),
+        descripcion: getString(item, ["descripcion", "Descripcion", "description", "Description"]),
+        cantidad: getNumber(item, ["cantidad", "Cantidad", "qty", "Qty", "quantity", "Quantity"])
       }))
       .filter((item) => item.referencia);
   } catch {

@@ -41,6 +41,31 @@ describe("interventionRepository", () => {
     expect(result.total).toBe(1);
   });
 
+
+  it("detalle parsea referencias legacy", async () => {
+    apiMock.get.mockResolvedValueOnce({
+      id: "7",
+      fields: {
+        NumeroSerie: "SN7",
+        Fecha: "2026-04-07",
+        TecnicoNombre: "Luis",
+        Hospital: "H7",
+        TipoIntervencion: "Correctivo",
+        Estado: "Activo",
+        MaterialesJson: JSON.stringify([
+          { Referencia: "REF-1", Descripcion: "Cable", Cantidad: "2" },
+          { reference: "REF-2", description: "Sensor", quantity: 1 }
+        ])
+      }
+    });
+
+    const result = await getInterventionById("7");
+    expect(result?.materialesJson).toEqual([
+      { referencia: "REF-1", descripcion: "Cable", cantidad: 2 },
+      { referencia: "REF-2", descripcion: "Sensor", cantidad: 1 }
+    ]);
+  });
+
   it("detalle 404", async () => {
     apiMock.get.mockRejectedValueOnce({ statusCode: 404 });
     const result = await getInterventionById("99");
