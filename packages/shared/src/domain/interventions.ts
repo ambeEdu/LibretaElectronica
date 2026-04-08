@@ -40,3 +40,26 @@ export interface InterventionResponse {
   ok: boolean;
   id?: string;
 }
+
+export interface InterventionListItem {
+  id: string;
+  fecha: string;
+  tecnicoNombre: string;
+  numeroSerie: string;
+  hospital: string;
+  tipoIntervencion: string;
+  estado: string;
+}
+
+export interface InterventionDetail extends InterventionRequest {
+  id: string;
+}
+
+export interface InterventionListResponse {
+  items: InterventionListItem[];
+  total: number;
+  top: number;
+  skip: number;
+}
+
+export type InterventionUpdateRequest = Partial<InterventionRequest>;

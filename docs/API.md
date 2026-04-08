@@ -1,192 +1,103 @@
 # Documentación de API
 
+## Convención de rutas (vigente)
+
+La convención final para intervenciones es **`/api/intervencion`**.
+
+> Nota de migración: el endpoint documentado previamente como `/api/interventions` queda **deprecado** y debe reemplazarse por `/api/intervencion` en frontend/integraciones.
+
 ## 🔌 Endpoints
 
 ### Equipment
 
-#### GET `/api/equipment/{numeroSerie}`
+#### GET `/api/equipo?serie={numeroSerie}`
 Obtiene información de un equipamiento por número de serie.
-
-**Parámetros:**
-- `numeroSerie` (string, requerido) - Número de serie del equipo
-
-**Respuesta exitosa (200):**
-```json
-{
-  "found": true,
-  "numeroSerie": "SN123456",
-  "hospital": "Hospital A",
-  "estado": "Activo",
-  "modelo": "Modelo X"
-}
-```
-
-**Respuesta no encontrado (404):**
-```json
-{
-  "found": false
-}
-```
-
----
 
 ### Materials
 
-#### GET `/api/material/{referencia}`
+#### GET `/api/material?referencia={referencia}&product={modelo}`
 Obtiene información de un material por referencia.
-
-**Parámetros:**
-- `referencia` (string, requerido) - Referencia del material
-
-**Respuesta exitosa (200):**
-```json
-{
-  "found": true,
-  "referencia": "REF-001",
-  "descripcion": "Sensor de temperatura",
-  "stockActual": 15,
-  "familia": "Sensores"
-}
-```
-
-**Respuesta no encontrado (404):**
-```json
-{
-  "found": false
-}
-```
 
 ---
 
-### Interventions
+### Intervenciones
 
-#### POST `/api/interventions`
+#### POST `/api/intervencion`
 Crea una nueva intervención.
 
-**Body:**
+#### GET `/api/intervencion`
+Lista intervenciones guardadas.
+
+**Query params opcionales**
+- `numeroSerie` (string)
+- `from` (string ISO date)
+- `to` (string ISO date)
+- `top` (number, default 20)
+- `skip` (number, default 0)
+
+**Response 200**
 ```json
 {
-    "tecnicoNombre": "Juan Pérez",
-  "fecha": "2024-03-26",
+  "items": [
+    {
+      "id": "25",
+      "fecha": "2026-04-08T10:30:00.000Z",
+      "tecnicoNombre": "Juan Pérez",
+      "numeroSerie": "SN123456",
+      "hospital": "Hospital A",
+      "tipoIntervencion": "Preventivo",
+      "estado": "Activo"
+    }
+  ],
+  "total": 1,
+  "top": 20,
+  "skip": 0
+}
+```
+
+#### GET `/api/intervencion/{id}`
+Obtiene detalle completo de una intervención.
+
+**Response 200**
+```json
+{
+  "id": "25",
+  "tecnicoNombre": "Juan Pérez",
+  "fecha": "2026-04-08T10:30:00.000Z",
   "tipoIntervencion": "Preventivo",
   "numeroSerie": "SN123456",
   "hospital": "Hospital A",
   "estado": "Activo",
-  "numeroInventario": "INV001",
-  "numeroParte": "PART001",
-  "modelo": "Modelo X",
-  "software": "v2.0",
-  "descripcionError": "Problema de conectividad",
-  "observaciones": "Se reemplazó componente",
-  "seguridadElectrica": "OK",
-  "materialesJson": [
-    {
-      "referencia": "REF-001",
-      "descripcion": "Sensor",
-      "cantidad": 2
-    }
-  ],
-  "mes": 3,
-  "anio": 2024,
+  "calibracionesJson": [{ "nombre": "Presión", "valor": "12" }],
+  "materialesJson": [{ "referencia": "REF-1", "descripcion": "Sensor", "cantidad": 1 }],
+  "mes": 4,
+  "anio": 2026,
   "archivado": false
 }
 ```
 
-**Respuesta exitosa (200):**
+#### PATCH `/api/intervencion/{id}`
+Actualiza una intervención existente.
+
+**Request example**
+```json
+{
+  "observaciones": "Se actualizó firmware y calibración.",
+  "software": "v3.1.2",
+  "calibracionesJson": [{ "nombre": "Presión", "valor": "11.8" }]
+}
+```
+
+**Response 200**
 ```json
 {
   "ok": true,
-  "id": "63f5a3c2e1d4b8f9a2c3d4e5"
+  "id": "25"
 }
 ```
 
-**Respuesta error (400):**
-```json
-{
-  "ok": false,
-  "errorCode": "BAD_REQUEST",
-  "message": "El campo 'tecnicoNombre' es requerido"
-}
-```
-
----
-
-## 🔐 Autenticación
-
-Actualmente sin autenticación. En futuro:
-```
-Header: Authorization: Bearer {token}
-```
-
----
-
-## 📊 Códigos de Error
-
-| Código | Status | Descripción |
-|--------|--------|-------------|
-| `BAD_REQUEST` | 400 | Datos inválidos o incompletos |
-| `UNAUTHORIZED` | 401 | No autenticado |
-| `FORBIDDEN` | 403 | No tiene permisos |
-| `NOT_FOUND` | 404 | Recurso no encontrado |
-| `CONFLICT` | 409 | Conflicto de datos |
-| `INTERNAL_ERROR` | 500 | Error en el servidor |
-
----
-
-## 🧪 Ejemplos con cURL
-
-```bash
-# Obtener equipamiento
-curl -X GET http://localhost:7071/api/equipment/SN123456
-
-# Obtener material
-curl -X GET http://localhost:7071/api/material/REF-001
-
-# Crear intervención
-curl -X POST http://localhost:7071/api/interventions \
-  -H "Content-Type: application/json" \
-  -d '{"tecnicoNombre":"...",...}'
-```
-
----
-
-## 📝 Tipos TypeScript
-
-Ver [packages/shared/src/domain/](../packages/shared/src/domain/) para las definiciones completas:
-
-```typescript
-import {
-  InterventionRequest,
-  InterventionResponse,
-  MaterialResult,
-  EquipmentResult
-} from "@ambe/shared";
-```
-
----
-
-## 🚀 Configuración Base URL
-
-### Desarrollo
-```
-http://localhost:7071
-```
-
-### Producción (Azure)
-```
-https://<function-app-name>.azurewebsites.net
-```
-
----
-
-## 📞 Rate Limiting
-
-- Límite: 100 requests/minuto por IP
-- Esperar si se excede
-
----
-
-## 🔗 Datos Relacionados
-
-- [ARCHITECTURE.md](./ARCHITECTURE.md) - Estructura del proyecto
-- [DEVELOPMENT.md](./DEVELOPMENT.md) - Guía de desarrollo
+### Errores
+- `400` validación de payload o query params.
+- `404` intervención no encontrada.
+- `403` sin permisos de edición en SharePoint.
+- `500` error interno.
