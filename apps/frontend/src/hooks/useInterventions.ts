@@ -21,8 +21,7 @@ export function useInterventions(filters: Filters) {
       const detailed = await Promise.all(response.items.map((item) => interventionService.getById(item.id)));
       setItems(detailed);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Error cargando intervenciones";
-      setError(message === "Failed to fetch" ? "No se pudo conectar con la API (/api/intervencion). Verifica proxy/base URL." : message);
+      
     } finally {
       setLoading(false);
     }
