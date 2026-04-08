@@ -1,7 +1,6 @@
-export interface MaterialLine {
-  referencia: string;
-  descripcion: string;
-  cantidad: number;
+import type { MaterialLine as BaseMaterialLine } from "@ambe/shared";
+
+export interface MaterialLine extends BaseMaterialLine {
   stockActual: number;
   familia?: string;
 }

@@ -6,6 +6,9 @@
 // Dominio
 export * from "./domain/index.js";
 
+// Datos
+export * from "./data.js";
+
 // Errores
 export * from "./errors/index.js";
 

@@ -5,11 +5,7 @@ import MaterialsTable from "../components/MaterialsTable";
 import InterventionInfo from "../components/InterventionInfo";
 import type { MaterialLine } from "../types/intervention";
 import SoftwareCalibrationSection from "../components/SoftwareCalibrationSection";
-import { valoresFamilia } from "../types/valoresFamilia";
-import {
-  softwarePorFamilia,
-  calibracionesPorFamilia
-} from "../types/software";
+import { valoresFamilia, softwarePorFamilia, calibracionesPorFamilia } from "@ambe/shared";
 
 export default function HomePage() {
   const [numeroSerie, setNumeroSerie] = useState("");

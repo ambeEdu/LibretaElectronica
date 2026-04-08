@@ -1,4 +1,4 @@
-import type { CalibrationRange } from "../types/software";
+import type { CalibrationRange } from "@ambe/shared";
 
 interface CalibrationValue {
   nombre: string;
