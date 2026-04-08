@@ -3,6 +3,15 @@ import { graphClient } from "../services/sharepointClient.js";
 import { env } from "../config/env.js";
 
 export async function saveIntervention(input: InterventionRequest): Promise<string> {
+  const calibracionesObj = (input.calibracionesJson ?? []).reduce((acc, cal) => {
+    acc[cal.nombre] = cal.valor;
+    return acc;
+  }, {} as Record<string, string>);
+
+  const materialesText = (input.materialesJson ?? []).map((material) =>
+    `${material.referencia} - ${material.descripcion}: ${material.cantidad} und`
+  );
+
   const result = await graphClient
     .api(`/sites/${env.sharePointSiteIdLibreta}/lists/${env.libretaList}/items`)
     .post({
@@ -21,8 +30,8 @@ export async function saveIntervention(input: InterventionRequest): Promise<stri
         DescripcionError: input.descripcionError || "",
         Observaciones: input.observaciones || "",
         SeguridadElectrica: input.seguridadElectrica || "",
-        Calibraciones: JSON.stringify(input.calibracionesJson ?? []),
-        MaterialesJson: JSON.stringify(input.materialesJson),
+        CalibracionesJson: JSON.stringify(calibracionesObj),
+        MaterialesJson: JSON.stringify(materialesText),
         Mes: input.mes,
         A_x00f1_o: input.anio,
         Archivado: input.archivado,

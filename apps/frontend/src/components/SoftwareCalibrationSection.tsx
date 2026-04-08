@@ -1,4 +1,8 @@
-import type { CalibrationRange } from "@ambe/shared";
+interface CalibrationRange {
+  nombre: string;
+  min: number | string;
+  max: number | string;
+}
 
 interface CalibrationValue {
   nombre: string;
@@ -12,6 +16,7 @@ interface Props {
   calibraciones: CalibrationRange[];
   calibrationValues: CalibrationValue[];
   setCalibrationValue: (nombre: string, valor: string) => void;
+  invalidCalibrationNames: Set<string>;
 }
 
 export default function SoftwareCalibrationSection({
@@ -20,7 +25,8 @@ export default function SoftwareCalibrationSection({
   setSoftwareSeleccionado,
   calibraciones,
   calibrationValues,
-  setCalibrationValue
+  setCalibrationValue,
+  invalidCalibrationNames
 }: Props) {
   return (
     <>
@@ -54,9 +60,13 @@ export default function SoftwareCalibrationSection({
           <tbody>
             {calibraciones.map((item) => {
               const actual = calibrationValues.find((c) => c.nombre === item.nombre);
+              const isInvalid = actual ? invalidCalibrationNames.has(item.nombre) : false;
 
               return (
-                <tr key={item.nombre}>
+                <tr
+                  key={item.nombre}
+                  style={{ backgroundColor: isInvalid ? "#ffe6e6" : "white" }}
+                >
                   <td style={tdStyle}>{item.nombre}</td>
                   <td style={tdStyle}>{item.min}</td>
                   <td style={tdStyle}>{item.max}</td>
@@ -64,6 +74,11 @@ export default function SoftwareCalibrationSection({
                     <input
                       value={actual?.valor || ""}
                       onChange={(e) => setCalibrationValue(item.nombre, e.target.value)}
+                      style={{
+                        borderColor: isInvalid ? "red" : "#ccc",
+                        borderWidth: 1,
+                        borderStyle: "solid"
+                      }}
                     />
                   </td>
                 </tr>

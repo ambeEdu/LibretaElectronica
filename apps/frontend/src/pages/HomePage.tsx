@@ -5,7 +5,19 @@ import MaterialsTable from "../components/MaterialsTable";
 import InterventionInfo from "../components/InterventionInfo";
 import type { MaterialLine } from "../types/intervention";
 import SoftwareCalibrationSection from "../components/SoftwareCalibrationSection";
-import { valoresFamilia, softwarePorFamilia, calibracionesPorFamilia } from "@ambe/shared";
+
+interface CalibrationRange {
+  nombre: string;
+  min: number | string;
+  max: number | string;
+}
+
+interface CalibrationValue {
+  nombre: string;
+  valor: string;
+  min?: number | string;
+  max?: number | string;
+}
 
 export default function HomePage() {
   const [numeroSerie, setNumeroSerie] = useState("");
@@ -18,6 +30,10 @@ export default function HomePage() {
   const [numeroInventario, setNumeroInventario] = useState("");
   const [numeroParte, setNumeroParte] = useState("");
 
+  const [valoresFamilia, setValoresFamilia] = useState<Record<string, string[]>>({});
+  const [softwarePorFamilia, setSoftwarePorFamilia] = useState<Record<string, string[]>>({});
+  const [calibracionesPorFamilia, setCalibracionesPorFamilia] = useState<Record<string, CalibrationRange[]>>({});
+
   const [descripcionError, setDescripcionError] = useState("");
   const [observaciones, setObservaciones] = useState("");
   const [seguridadElectrica, setSeguridadElectrica] = useState("OK");
@@ -26,9 +42,7 @@ export default function HomePage() {
   const [materiales, setMateriales] = useState<MaterialLine[]>([]);
 
   const [softwareSeleccionado, setSoftwareSeleccionado] = useState("");
-  const [calibrationValues, setCalibrationValues] = useState<
-    { nombre: string; valor: string; min?: number | string; max?: number | string }[]
-  >([]);
+  const [calibrationValues, setCalibrationValues] = useState<CalibrationValue[]>([]);
 
   const hoy = new Date();
   const dia = String(hoy.getDate()).padStart(2, "0");
@@ -38,6 +52,26 @@ export default function HomePage() {
   const fechaInput = `${anio}-${mes}-${dia}`;
   const fechaTexto = `${dia}/${mes}/${anio}`;
 
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [valoresRes, softwareRes, calibracionesRes] = await Promise.all([
+          fetch("/api/valores-familia"),
+          fetch("/api/software-por-familia"),
+          fetch("/api/calibraciones-por-familia")
+        ]);
+
+        if (valoresRes.ok) setValoresFamilia(await valoresRes.json());
+        if (softwareRes.ok) setSoftwarePorFamilia(await softwareRes.json());
+        if (calibracionesRes.ok) setCalibracionesPorFamilia(await calibracionesRes.json());
+      } catch (error) {
+        console.error("Error loading data:", error);
+      }
+    };
+
+    loadData();
+  }, []);
+
   const familiasExcel = modelo ? valoresFamilia[modelo] || [] : [];
 
   const softwareOptions = Array.from(
@@ -45,6 +79,10 @@ export default function HomePage() {
       familiasExcel.flatMap((familia) => softwarePorFamilia[familia] || [])
     )
   );
+
+  console.log("Modelo:", modelo);
+  console.log("FamiliasExcel:", familiasExcel);
+  console.log("SoftwareOptions:", softwareOptions);
 
   const calibraciones = Array.from(
     new Map(
@@ -58,6 +96,34 @@ export default function HomePage() {
     setSoftwareSeleccionado("");
     setCalibrationValues([]);
   }, [modelo]);
+
+  function parseCalibrationNumber(value: string | number | undefined): number | null {
+    if (value === undefined || value === null) return null;
+    const parsed = typeof value === "number" ? value : Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  function isCalibrationValueInvalid(value: CalibrationValue): boolean {
+    const valorNum = parseCalibrationNumber(value.valor);
+    const minNum = parseCalibrationNumber(value.min);
+    const maxNum = parseCalibrationNumber(value.max);
+
+    if (!value.valor.trim()) {
+      return false;
+    }
+
+    if (valorNum === null || minNum === null || maxNum === null) {
+      return false;
+    }
+
+    return valorNum < minNum || valorNum > maxNum;
+  }
+
+  const invalidCalibrationNames = new Set(
+    calibrationValues.filter(isCalibrationValueInvalid).map((item) => item.nombre)
+  );
+
+  const hasInvalidCalibration = invalidCalibrationNames.size > 0;
 
   function setCalibrationValue(nombre: string, valor: string) {
     const calibracion = calibraciones.find((c) => c.nombre === nombre);
@@ -171,6 +237,11 @@ export default function HomePage() {
       return;
     }
 
+    if (hasInvalidCalibration) {
+      alert("No puedes guardar con valores de calibración fuera de los márgenes mínimos o máximos.");
+      return;
+    }
+
     const payload = {
       tecnicoNombre,
       fecha: hoy.toISOString(),
@@ -267,7 +338,14 @@ export default function HomePage() {
         calibraciones={calibraciones}
         calibrationValues={calibrationValues}
         setCalibrationValue={setCalibrationValue}
+        invalidCalibrationNames={invalidCalibrationNames}
       />
+
+      {hasInvalidCalibration && (
+        <div style={{ color: "red", marginTop: 10 }}>
+          Hay valores de calibración fuera del rango mínimo/máximo. Corrige los valores marcados en rojo.
+        </div>
+      )}
 
       <InterventionInfo
         descripcionError={descripcionError}
@@ -278,7 +356,15 @@ export default function HomePage() {
         setSeguridadElectrica={setSeguridadElectrica}
       />
 
-      <button onClick={guardarIntervencion} style={{ marginTop: 30 }}>
+      <button
+        onClick={guardarIntervencion}
+        disabled={hasInvalidCalibration}
+        style={{
+          marginTop: 30,
+          opacity: hasInvalidCalibration ? 0.6 : 1,
+          cursor: hasInvalidCalibration ? "not-allowed" : "pointer"
+        }}
+      >
         Guardar intervención
       </button>
     </div>
