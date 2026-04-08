@@ -1,299 +1,51 @@
-import { useEffect, useState } from "react";
-import HeaderForm from "../components/HeaderForm";
-import MaterialSearch from "../components/MaterialSearch";
-import MaterialsTable from "../components/MaterialsTable";
-import InterventionInfo from "../components/InterventionInfo";
-import type { MaterialLine } from "../types/intervention";
-import SoftwareCalibrationSection from "../components/SoftwareCalibrationSection";
-
-interface CalibrationRange {
-  nombre: string;
-  min: number | string;
-  max: number | string;
-}
-
-interface CalibrationValue {
-  nombre: string;
-  valor: string;
-  min?: number | string;
-  max?: number | string;
-}
+import { useMemo, useState } from "react";
+import type { InterventionDetail, InterventionRequest } from "@ambe/shared";
+import InterventionForm from "../components/InterventionForm";
+import InterventionsList from "../components/InterventionsList";
+import { useInterventions } from "../hooks/useInterventions";
 
 export default function HomePage() {
-  const [numeroSerie, setNumeroSerie] = useState("");
-  const [hospital, setHospital] = useState("");
-  const [estado, setEstado] = useState("");
-  const [modelo, setModelo] = useState("");
+  const [numeroSerieFilter, setNumeroSerieFilter] = useState("");
+  const [fromFilter, setFromFilter] = useState("");
+  const [toFilter, setToFilter] = useState("");
+  const [editing, setEditing] = useState<InterventionDetail | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [readOnlyEdit, setReadOnlyEdit] = useState(false);
 
-  const [tecnicoNombre, setTecnicoNombre] = useState("");
-  const [tipoIntervencion, setTipoIntervencion] = useState("");
-  const [numeroInventario, setNumeroInventario] = useState("");
-  const [numeroParte, setNumeroParte] = useState("");
+  const filters = useMemo(
+    () => ({ numeroSerie: numeroSerieFilter || undefined, from: fromFilter || undefined, to: toFilter || undefined }),
+    [numeroSerieFilter, fromFilter, toFilter]
+  );
 
-  const [valoresFamilia, setValoresFamilia] = useState<Record<string, string[]>>({});
-  const [softwarePorFamilia, setSoftwarePorFamilia] = useState<Record<string, string[]>>({});
-  const [calibracionesPorFamilia, setCalibracionesPorFamilia] = useState<Record<string, CalibrationRange[]>>({});
+  const { items, loading, error, create, update } = useInterventions(filters);
 
-  const [descripcionError, setDescripcionError] = useState("");
-  const [observaciones, setObservaciones] = useState("");
-  const [seguridadElectrica, setSeguridadElectrica] = useState("OK");
+  async function openEditor(id: string) {
+    const selected = items.find((item) => item.id === id) ?? null;
+    setEditing(selected);
+    setReadOnlyEdit(false);
+    setFeedback(null);
+  }
 
-  const [referenciaBusqueda, setReferenciaBusqueda] = useState("");
-  const [materiales, setMateriales] = useState<MaterialLine[]>([]);
+  async function handleCreate(payload: InterventionRequest) {
+    await create(payload);
+    setFeedback("Intervención guardada correctamente.");
+  }
 
-  const [softwareSeleccionado, setSoftwareSeleccionado] = useState("");
-  const [calibrationValues, setCalibrationValues] = useState<CalibrationValue[]>([]);
+  async function handleUpdate(payload: InterventionRequest) {
+    if (!editing) return;
 
-  const hoy = new Date();
-  const dia = String(hoy.getDate()).padStart(2, "0");
-  const mes = String(hoy.getMonth() + 1).padStart(2, "0");
-  const anio = hoy.getFullYear();
-
-  const fechaInput = `${anio}-${mes}-${dia}`;
-  const fechaTexto = `${dia}/${mes}/${anio}`;
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [valoresRes, softwareRes, calibracionesRes] = await Promise.all([
-          fetch("/api/valores-familia"),
-          fetch("/api/software-por-familia"),
-          fetch("/api/calibraciones-por-familia")
-        ]);
-
-        if (valoresRes.ok) setValoresFamilia(await valoresRes.json());
-        if (softwareRes.ok) setSoftwarePorFamilia(await softwareRes.json());
-        if (calibracionesRes.ok) setCalibracionesPorFamilia(await calibracionesRes.json());
-      } catch (error) {
-        console.error("Error loading data:", error);
+    try {
+      await update(editing.id, payload);
+      setEditing(null);
+      setFeedback("Intervención actualizada correctamente.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "No se pudo actualizar";
+      if (message.toLowerCase().includes("403") || message.toLowerCase().includes("permis")) {
+        setReadOnlyEdit(true);
+        setFeedback("No tienes permisos de edición en SharePoint. Se muestra en modo solo lectura.");
+        return;
       }
-    };
-
-    loadData();
-  }, []);
-
-  const familiasExcel = modelo ? valoresFamilia[modelo] || [] : [];
-
-  const softwareOptions = Array.from(
-    new Set(
-      familiasExcel.flatMap((familia) => softwarePorFamilia[familia] || [])
-    )
-  );
-
-  console.log("Modelo:", modelo);
-  console.log("FamiliasExcel:", familiasExcel);
-  console.log("SoftwareOptions:", softwareOptions);
-
-  const calibraciones = Array.from(
-    new Map(
-      familiasExcel
-        .flatMap((familia) => calibracionesPorFamilia[familia] || [])
-        .map((item) => [item.nombre, item])
-    ).values()
-  );
-
-  useEffect(() => {
-    setSoftwareSeleccionado("");
-    setCalibrationValues([]);
-  }, [modelo]);
-
-  function parseCalibrationNumber(value: string | number | undefined): number | null {
-    if (value === undefined || value === null) return null;
-    const parsed = typeof value === "number" ? value : Number(value);
-    return Number.isFinite(parsed) ? parsed : null;
-  }
-
-  function isCalibrationValueInvalid(value: CalibrationValue): boolean {
-    const valorNum = parseCalibrationNumber(value.valor);
-    const minNum = parseCalibrationNumber(value.min);
-    const maxNum = parseCalibrationNumber(value.max);
-
-    if (!value.valor.trim()) {
-      return false;
-    }
-
-    if (valorNum === null || minNum === null || maxNum === null) {
-      return false;
-    }
-
-    return valorNum < minNum || valorNum > maxNum;
-  }
-
-  const invalidCalibrationNames = new Set(
-    calibrationValues.filter(isCalibrationValueInvalid).map((item) => item.nombre)
-  );
-
-  const hasInvalidCalibration = invalidCalibrationNames.size > 0;
-
-  function setCalibrationValue(nombre: string, valor: string) {
-    const calibracion = calibraciones.find((c) => c.nombre === nombre);
-
-    setCalibrationValues((prev) => {
-      const existente = prev.find((c) => c.nombre === nombre);
-
-      if (existente) {
-        return prev.map((c) =>
-          c.nombre === nombre
-            ? {
-                ...c,
-                valor,
-                min: calibracion?.min,
-                max: calibracion?.max
-              }
-            : c
-        );
-      }
-
-      return [
-        ...prev,
-        {
-          nombre,
-          valor,
-          min: calibracion?.min,
-          max: calibracion?.max
-        }
-      ];
-    });
-  }
-
-  async function buscarEquipo() {
-    if (!numeroSerie) return;
-
-    const res = await fetch(`/api/equipo?serie=${encodeURIComponent(numeroSerie)}`);
-    const data = await res.json();
-
-    if (data.found) {
-      setHospital(data.hospital || "");
-      setEstado(data.estado || "");
-      setModelo(data.modelo || "");
-    } else {
-      setHospital("");
-      setEstado("");
-      setModelo("");
-      alert("Equipo no encontrado");
-    }
-  }
-
-  async function agregarMaterial() {
-    if (!referenciaBusqueda) return;
-
-    if (!modelo) {
-      alert("Primero debes buscar un equipo válido");
-      return;
-    }
-
-    const res = await fetch(
-      `/api/material?referencia=${encodeURIComponent(
-        referenciaBusqueda
-      )}&product=${encodeURIComponent(modelo)}`
-    );
-
-    const data = await res.json();
-
-    if (!data.found) {
-      alert("Referencia no encontrada o no válida para este equipo");
-      return;
-    }
-
-    const existente = materiales.find((m) => m.referencia === data.referencia);
-
-    if (existente) {
-      setMateriales((prev) =>
-        prev.map((m) =>
-          m.referencia === data.referencia
-            ? { ...m, cantidad: m.cantidad + 1 }
-            : m
-        )
-      );
-    } else {
-      setMateriales((prev) => [
-        ...prev,
-        {
-          referencia: data.referencia,
-          descripcion: data.descripcion,
-          cantidad: 1,
-          stockActual: data.stockActual,
-          familia: data.familia
-        }
-      ]);
-    }
-
-    setReferenciaBusqueda("");
-  }
-
-  function actualizarCantidad(referencia: string, cantidad: number) {
-    setMateriales((prev) =>
-      prev.map((m) => (m.referencia === referencia ? { ...m, cantidad } : m))
-    );
-  }
-
-  function eliminarMaterial(referencia: string) {
-    setMateriales((prev) => prev.filter((m) => m.referencia !== referencia));
-  }
-
-  async function guardarIntervencion() {
-    if (!tipoIntervencion) {
-      alert("Debes seleccionar un tipo de intervención");
-      return;
-    }
-
-    if (hasInvalidCalibration) {
-      alert("No puedes guardar con valores de calibración fuera de los márgenes mínimos o máximos.");
-      return;
-    }
-
-    const payload = {
-      tecnicoNombre,
-      fecha: hoy.toISOString(),
-      tipoIntervencion,
-      numeroSerie,
-      hospital,
-      estado,
-      numeroInventario,
-      numeroParte,
-      modelo,
-      familiasExcel,
-      software: softwareSeleccionado,
-      calibracionesJson: calibrationValues,
-      descripcionError,
-      observaciones,
-      seguridadElectrica,
-      materialesJson: materiales,
-      mes,
-      anio,
-      archivado: false,
-      fechaArchivado: null
-    };
-
-    const res = await fetch("/api/intervencion", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (res.ok) {
-      alert("Intervención guardada");
-      setMateriales([]);
-      setNumeroSerie("");
-      setHospital("");
-      setEstado("");
-      setModelo("");
-      setTecnicoNombre("");
-      setTipoIntervencion("");
-      setNumeroInventario("");
-      setNumeroParte("");
-      setDescripcionError("");
-      setObservaciones("");
-      setSeguridadElectrica("OK");
-      setReferenciaBusqueda("");
-      setSoftwareSeleccionado("");
-      setCalibrationValues([]);
-    } else {
-      const errorText = await res.text();
-      console.error("Error guardando intervención:", errorText);
-      alert(`Error guardando intervención: ${errorText}`);
+      setFeedback(`Error al actualizar: ${message}`);
     }
   }
 
@@ -301,72 +53,35 @@ export default function HomePage() {
     <div style={{ padding: 30, fontFamily: "Arial" }}>
       <h2>Libreta electrónica</h2>
 
-      <HeaderForm
-        numeroSerie={numeroSerie}
-        setNumeroSerie={setNumeroSerie}
-        hospital={hospital}
-        estado={estado}
-        modelo={modelo}
-        tecnicoNombre={tecnicoNombre}
-        setTecnicoNombre={setTecnicoNombre}
-        fecha={fechaInput}
-        tipoIntervencion={tipoIntervencion}
-        setTipoIntervencion={setTipoIntervencion}
-        numeroInventario={numeroInventario}
-        setNumeroInventario={setNumeroInventario}
-        numeroParte={numeroParte}
-        setNumeroParte={setNumeroParte}
-        buscarEquipo={buscarEquipo}
+      {feedback && <p style={{ color: feedback.startsWith("Error") ? "red" : "green" }}>{feedback}</p>}
+
+      <InterventionForm mode="create" submitLabel="Guardar intervención" onSubmit={handleCreate} />
+
+      <InterventionsList
+        items={items}
+        loading={loading}
+        error={error}
+        numeroSerie={numeroSerieFilter}
+        from={fromFilter}
+        to={toFilter}
+        onNumeroSerieChange={setNumeroSerieFilter}
+        onFromChange={setFromFilter}
+        onToChange={setToFilter}
+        onEdit={(id) => void openEditor(id)}
       />
 
-      <MaterialSearch
-        referenciaBusqueda={referenciaBusqueda}
-        setReferenciaBusqueda={setReferenciaBusqueda}
-        agregarMaterial={agregarMaterial}
-      />
-
-      <MaterialsTable
-        materiales={materiales}
-        actualizarCantidad={actualizarCantidad}
-        eliminarMaterial={eliminarMaterial}
-      />
-
-      <SoftwareCalibrationSection
-        softwareOptions={softwareOptions}
-        softwareSeleccionado={softwareSeleccionado}
-        setSoftwareSeleccionado={setSoftwareSeleccionado}
-        calibraciones={calibraciones}
-        calibrationValues={calibrationValues}
-        setCalibrationValue={setCalibrationValue}
-        invalidCalibrationNames={invalidCalibrationNames}
-      />
-
-      {hasInvalidCalibration && (
-        <div style={{ color: "red", marginTop: 10 }}>
-          Hay valores de calibración fuera del rango mínimo/máximo. Corrige los valores marcados en rojo.
+      {editing && (
+        <div style={{ marginTop: 30, paddingTop: 20, borderTop: "2px solid #ccc" }}>
+          <h3>Editar intervención #{editing.id}</h3>
+          <InterventionForm
+            mode="edit"
+            initialData={editing}
+            onSubmit={handleUpdate}
+            submitLabel={readOnlyEdit ? "Sin permisos de edición" : "Guardar cambios"}
+            readOnly={readOnlyEdit}
+          />
         </div>
       )}
-
-      <InterventionInfo
-        descripcionError={descripcionError}
-        setDescripcionError={setDescripcionError}
-        observaciones={observaciones}
-        setObservaciones={setObservaciones}
-        seguridadElectrica={seguridadElectrica}
-        setSeguridadElectrica={setSeguridadElectrica}
-      />
-
-      <button
-        onClick={guardarIntervencion}
-        disabled={hasInvalidCalibration}
-        style={{
-          marginTop: 30,
-          opacity: hasInvalidCalibration ? 0.6 : 1,
-          cursor: hasInvalidCalibration ? "not-allowed" : "pointer"
-        }}
-      >
-        Guardar intervención
-      </button>
     </div>
   );
 }

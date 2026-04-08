@@ -3,7 +3,7 @@
  * Configuración base para todas las peticiones HTTP
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:7071";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
 interface ApiOptions extends RequestInit {
   timeout?: number;
@@ -59,6 +59,13 @@ export const api = {
     apiRequest<T>(endpoint, {
       ...options,
       method: "PUT",
+      body: data ? JSON.stringify(data) : undefined,
+    }),
+
+  patch: <T,>(endpoint: string, data?: unknown, options?: ApiOptions) =>
+    apiRequest<T>(endpoint, {
+      ...options,
+      method: "PATCH",
       body: data ? JSON.stringify(data) : undefined,
     }),
 
