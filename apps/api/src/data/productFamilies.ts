@@ -72,7 +72,7 @@ export const productFamilies: Record<string, string[]> = {
   "8003MED01-G-EOL - ALARIS CC PLUS WITH GUARDRAILS - End Of Life": ["SP", "SP MK IV"],
   "8003TIG01 - Alaris CC Plus Syringe Pump": ["SP", "SP MK IV"],
   "8003TIG01-G - Alaris CC Plus Guardrails Syringe Pump": ["SP", "SP MK IV"],
-  "8003TIG03-G - ALARIS CC-G PLUS SYRINGE PUMP": ["SP", "SP MK IV"],
+  "8003TIG03-G - ALARIS CC-G PLUS SYRINGE PUMP": ["CC", "SP MK IV"],
   "CCNEXUS1 - NEXUS ALARIS PLUS CC PUMP": ["SP", "SP MK IV"],
   "80083UN00-40 - ASENA DS - 4X0 CONFIGURATION 240V": ["DS", "DS / AGW"],
   "80283UNS00-40 - ALARIS DOCKING STATION 4x0": ["DS", "DS / AGW"],

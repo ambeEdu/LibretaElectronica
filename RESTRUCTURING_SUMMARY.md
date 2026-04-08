@@ -2,6 +2,15 @@
 
 Para completar la reorganización y mejorar el proyecto, se recomienda:
 
+### Instalar deppendencias: 
+
+npm install -g pnpm
+npm install -g azure-functions-core-tools@4 --unsafe-perm true
+
+pnpm dev:api
+pnpm dev:frontend
+
+
 ### 🔧 Dependencias para el API
 
 ```bash
