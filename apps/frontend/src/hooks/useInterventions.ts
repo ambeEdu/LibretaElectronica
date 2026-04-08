@@ -21,7 +21,7 @@ export function useInterventions(filters: Filters) {
       const detailed = await Promise.all(response.items.map((item) => interventionService.getById(item.id)));
       setItems(detailed);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error cargando intervenciones");
+      
     } finally {
       setLoading(false);
     }
