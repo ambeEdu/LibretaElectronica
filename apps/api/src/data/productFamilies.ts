@@ -92,7 +92,7 @@ export const productFamilies: Record<string, string[]> = {
   "80263UN01-G - ALARIS GP VOLUMETRIC PUMP GUARDRAILS": ["GP", "GP / VP", "GW / SE / GP / VP"],
   "9002MED01 - ALARIS GP PLUS": ["GP", "GP / VP", "GW / SE / GP / VP"],
   "9002MED01-G - Alaris GP Guardrails Pump (with Plus s/w": ["GP", "GP / VP", "GW / SE / GP / VP"],
-  "9002TIG01 - ALARIS GP Plus Pump": ["GP", "GP / VP", "GW / SE / GP / VP"],
+  "9002TIG01 - ALARIS GP Plus Pump": ["GP"],
   "9002TIG01-G - ALARIS GP Plus GUARDRAILS Pump": ["GP", "GP / VP", "GW / SE / GP / VP"],
   "9002TIG03-G - ALARIS GP PLUS GUARDRAILS PUMP": ["GP", "GP / VP", "GW / SE / GP / VP"],
   "GPNEXUS1 - BD ALARIS NEXUS GP": ["GP", "GP / VP", "GW / SE / GP / VP"],

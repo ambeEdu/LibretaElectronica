@@ -7,6 +7,8 @@ Para completar la reorganización y mejorar el proyecto, se recomienda:
 npm install -g pnpm
 npm install -g azure-functions-core-tools@4 --unsafe-perm true
 
+pnpm install
+
 pnpm dev:api
 pnpm dev:frontend
 

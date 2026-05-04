@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^cd /workspaces/LibretaElectronica/apps/frontend && pnpm test 2>&1 \\| head -100$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
